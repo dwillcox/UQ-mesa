@@ -11,6 +11,8 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('infile', type=str, help='Name of the input csv file containing (x, y, value) data series.')
+parser.add_argument('-log', '--logfile', type=str, help='Name of the log file in which to write the status of intermediate steps. If --logfile is not supplied, no intermediate printing will be done.')
+parser.add_argument('-o', '--outfile', type=str, help='Name of the summary file in which to print the final tiling result.')
 args = parser.parse_args()
 
 # Read Data
@@ -35,7 +37,10 @@ lo = [np.amin(xvec), np.amin(yvec)]
 hi = [np.amax(xvec), np.amax(yvec)]
 
 # Form Domain
-dom = Domain(points=pointlist, lo=lo, hi=hi)
+dom = Domain(points=pointlist, lo=lo, hi=hi, logfile=args.logfile, summaryfile=args.outfile)
 
 # Tile Domain
 dom.do_domain_tiling(gnr_thresh=0.05, tilde_resd_thresh=0.01, tilde_resd_factor=1.25, attempt_virtual_shrink=True)
+
+# Cleanup, closing open file handles
+dom.close()
